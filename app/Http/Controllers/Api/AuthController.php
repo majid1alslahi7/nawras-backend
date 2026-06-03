@@ -14,8 +14,22 @@ class AuthController extends Controller
     {
         $user = User::where('phone', $request->phone)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'رقم الهاتف أو كلمة المرور غير صحيحة'], 401);
+        if (!$user) {
+            return response()->json([
+                'message' => 'رقم الهاتف غير مسجل في النظام',
+                'errors' => [
+                    'phone' => ['رقم الهاتف غير مسجل في النظام'],
+                ],
+            ], 401);
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'كلمة المرور غير صحيحة',
+                'errors' => [
+                    'password' => ['كلمة المرور غير صحيحة'],
+                ],
+            ], 401);
         }
 
         if (!$user->is_active) {
